@@ -1,0 +1,91 @@
+#creating table of inventory at a bottle store, including price, style, alcohol content, and brewery
+
+CREATE TABLE beer_store (id INTEGER PRIMARY KEY, name TEXT, style TEXT, brewery TEXT, abv INTEGER, price INTEGER);
+
+INSERT INTO beer_store VALUES (1, "Slang Du Jour", "Sour - Smoothie", "Drekker Brewing Company", 6.1, 8.50);
+INSERT INTO beer_store VALUES (2, "Skinny Vanilla Latte", "Stout - White", "Fam's Brewing Company", 5.0, 5);
+INSERT INTO beer_store VALUES (3, "Through the Brambles", "Sour - Wild Ale", "Sweetwater Brewing Company", 6.2, 9);
+INSERT INTO beer_store VALUES (4, "Don't Even Trip", "IPA - Double", "Modist Brewing Company", 8.3, 6.50);
+INSERT INTO beer_store VALUES (5, "Pineapple Shake", "IPA - Milkshake", "Westbrook Brewing Co", 7.0, 6);
+INSERT INTO beer_store VALUES (6, "Searching For Euphoria", "IPA - New England", "Monday Night Brewing Company", 9.1, 5.50);
+INSERT INTO beer_store VALUES (7, "Boysenberry Milkshake", "IPA - Milkshake", "Dangerous Man Brewing Co", 6.7, 6.20);
+INSERT INTO beer_store VALUES (8, "Nautical Haze", "IPA - Double", "Low Tide Brewing", 8.0, 7);
+INSERT INTO beer_store VALUES (9, "Fairground Balloons", "Pale Ale", "Edmund's Oast Brewing Company", 6.0, 5.75);
+INSERT INTO beer_store VALUES (10, "Pryes Winning Cobbler", "Fruit Beer", "Pryes Brewing", 5.2, 5.50);
+INSERT INTO beer_store VALUES (11, "Angry Planet", "Pale Ale", "St Paul Brewing Company", 6.0, 5.60);
+INSERT INTO beer_store VALUES (12, "C.R.E.A.M.", "Stout - Milk", "Modist Brewing Company", 8.3, 6.50);
+INSERT INTO beer_store VALUES (13, "Bourbon County", "Stout - Imperial", "Goose Island Beer Co", 14.6, 10.25);
+INSERT INTO beer_store VALUES (14, "Ch Ch Ch Ah Ah Ah", "Stout - Imperial", "Modist Brewing Company", 13, 8);
+INSERT INTO beer_store VALUES (15, "Kellerweis", "Hefeweizen", "Sierra Nevada Brewing Co", 4.8, 5.25);
+
+#separate table showing brewery locations
+
+CREATE TABLE brewery_locations (id INTEGER PRIMARY KEY, brewery TEXT, location TEXT);
+
+INSERT INTO brewery_locations (brewery, location) VALUES ("Modist Brewing Company", "Minneapolis, MN");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Dangerous Man Brewing Co", "Minneapolis, MN");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Drekker Brewing Company", "Fargo, ND");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Low Tide Brewing", "Charleston, SC");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Pryes Brewing", "Minneapolis, MN");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Fam's Brewing Company", "Charleston, SC");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Sweetwater Brewing Company", "Atlanta, GA");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Monday Night Brewing Company", "Atlanta, GA");
+INSERT INTO brewery_locations (brewery, location) VALUES ("St Paul Brewing Company", "St Paul, MN");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Edmund's Oast Brewing Company", "Charleston, SC");
+INSERT INTO brewery_locations (brewery, location) VALUES ("Sierra Nevada Brewing Co", "Asheville, NC");
+
+#separate table to show flavor profiles of different styles
+
+CREATE TABLE style_categories (id INTEGER PRIMARY KEY, style TEXT, category TEXT);
+
+INSERT INTO style_categories (style, category) VALUES ("Pale Ale", "Hoppy");
+INSERT INTO style_categories (style, category) VALUES ("IPA - Milkshake", "Hoppy");
+INSERT INTO style_categories (style, category) VALUES ("IPA - New England", "Hoppy");
+INSERT INTO style_categories (style, category) VALUES ("IPA - Double", "Hoppy");
+INSERT INTO style_categories (style, category) VALUES ("IPA - American", "Hoppy");
+INSERT INTO style_categories (style, category) VALUES ("Hefeweizen", "Wheat");
+INSERT INTO style_categories (style, category) VALUES ("Fruit Beer", "Wheat");
+INSERT INTO style_categories (style, category) VALUES ("Stout - Imperial", "Dark");
+INSERT INTO style_categories (style, category) VALUES ("Porter", "Dark");
+INSERT INTO style_categories (style, category) VALUES ("Stout - White", "Dark");
+INSERT INTO style_categories (style, category) VALUES ("Stout - Milk", "Dark");
+INSERT INTO style_categories (style, category) VALUES ("Sour - Smoothie", "Sour");
+INSERT INTO style_categories (style, category) VALUES ("Sour - Wild Ale", "Sour");
+
+#creating table that only shows beer with alcohol content below 10%
+
+SELECT name, style, brewery, abv, price FROM beer_store WHERE abv < 10 ORDER BY price;
+
+#table only shows IPAs that are available
+
+SELECT name, brewery, abv, price FROM beer_store WHERE style LIKE "%IPA%" GROUP BY name;
+
+#this store is located in minnesota, so this table uses an IN function to only show local beers
+
+SELECT name, brewery, abv, price FROM beer_store WHERE brewery IN (SELECT brewery FROM brewery_locations WHERE location LIKE "%MN%") ORDER BY brewery;
+
+#joins beer store and location tables
+
+SELECT beer_store.name, beer_store.style, beer_store.brewery,brewery_locations.location, beer_store.abv, beer_store.price
+FROM beer_store
+JOIN brewery_locations
+ON beer_store.brewery = brewery_locations.brewery
+ORDER BY style;
+
+#joins beer store and style category tables
+
+SELECT beer_store.name, beer_store.style, style_categories.category
+FROM beer_store
+JOIN style_categories
+ON beer_store.style = style_categories.style
+ORDER BY category;
+
+#joins all 3 tables and sorts by flavor profile
+
+SELECT beer_store.name, beer_store.style, beer_store.brewery,brewery_locations.location, beer_store.abv, beer_store.price
+FROM beer_store
+JOIN brewery_locations
+ON beer_store.brewery = brewery_locations.brewery
+JOIN style_categories
+ON beer_store.style = style_categories.style
+ORDER BY category;
